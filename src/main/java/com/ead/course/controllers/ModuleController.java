@@ -7,7 +7,6 @@ import com.ead.course.services.CourseService;
 import com.ead.course.services.ModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -37,16 +35,18 @@ public class ModuleController {
 
         Optional<CourseModel> optionalCourseModel = courseService.findById(courseId);
 
-        if (optionalCourseModel.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found!");
-        }
-        var moduleModel = new ModuleModel();
-        BeanUtils.copyProperties(moduleDTO, moduleModel);
+        return optionalCourseModel.<ResponseEntity<Object>>map(courseModel -> {
 
-        moduleModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
-        moduleModel.setCourse(optionalCourseModel.get());
+            ModuleModel moduleModel = new ModuleModel();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(moduleService.save(moduleModel));
+            BeanUtils.copyProperties(moduleDTO, moduleModel);
+            moduleModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
+            moduleModel.setCourse(courseModel);
+
+            return ResponseEntity.status(CREATED).body(moduleService.save(moduleModel));
+
+        }).orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Course not found!"));
+
 
     }
 
@@ -55,11 +55,12 @@ public class ModuleController {
                                                @PathVariable(value = "moduleId") UUID moduleId) {
         Optional<ModuleModel> optionalModuleModel = moduleService.findModuleIntoCourse(courseId, moduleId);
 
-        if (optionalModuleModel.isEmpty()) {
-            ResponseEntity.status(NOT_FOUND).body("Module Not Found!");
-        }
-        moduleService.delete(optionalModuleModel.get());
-        return ResponseEntity.status(OK).body("Module Deleted with Successful");
+
+        return optionalModuleModel.<ResponseEntity<Object>>map(moduleModel -> {
+            moduleService.delete(optionalModuleModel.get());
+            return ResponseEntity.status(OK).body("Module Deleted with Successful");
+        }).orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Module Not Found!"));
+
     }
 
     @PutMapping("/courses/{courseId}/modules/{moduleId}")
@@ -67,14 +68,14 @@ public class ModuleController {
                                                @PathVariable(value = "moduleId") UUID moduleId,
                                                @Valid @RequestBody ModuleDTO moduleDTO) {
         Optional<ModuleModel> optionalModuleModel = moduleService.findModuleIntoCourse(courseId, moduleId);
-        if (!optionalModuleModel.isPresent()) {
-            ResponseEntity.status(NOT_FOUND).body("Module Not Found!");
-        }
-        var moduleModel = optionalModuleModel.get();
-        moduleModel.setTitle(moduleDTO.getTitle());
-        moduleModel.setDescription(moduleDTO.getDescription());
 
-        return ResponseEntity.status(OK).body(moduleService.save(moduleModel));
+        return optionalModuleModel.<ResponseEntity<Object>>map(moduleModel -> {
+                    moduleModel.setTitle(moduleDTO.getTitle());
+                    moduleModel.setDescription(moduleDTO.getDescription());
+
+                    return ResponseEntity.status(OK).body(moduleService.save(moduleModel));
+                })
+                .orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Module Not Found!"));
 
     }
 
@@ -87,9 +88,9 @@ public class ModuleController {
     ResponseEntity<Object> getModuleModel(@PathVariable(value = "courseId") UUID courseId,
                                           @PathVariable(value = "moduleId") UUID moduleId) {
         Optional<ModuleModel> optionalModuleModel = moduleService.findModuleIntoCourse(courseId, moduleId);
-        if (!optionalModuleModel.isPresent()) {
-            return ResponseEntity.status(NOT_FOUND).body("Module Not Found!");
-        }
-        return ResponseEntity.status(OK).body(optionalModuleModel.get());
+
+        return optionalModuleModel.<ResponseEntity<Object>>map(moduleModel ->
+                        ResponseEntity.status(OK).body(moduleModel))
+                .orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Module Not Found!"));
     }
 }

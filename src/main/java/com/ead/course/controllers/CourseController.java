@@ -39,30 +39,27 @@ public class CourseController {
     @DeleteMapping("/{courseId}")
     public ResponseEntity<Object> deleteCourse(@PathVariable UUID courseId) {
         Optional<CourseModel> optionalCourseModel = courseService.findById(courseId);
-        if (!optionalCourseModel.isPresent()) {
-            ResponseEntity.status(NOT_FOUND).body("Course Not Found!");
-        }
-        courseService.delete(optionalCourseModel.get());
-        return ResponseEntity.status(OK).body("Course Deleted with Successful");
+
+        return optionalCourseModel.<ResponseEntity<Object>>map(courseModel -> {
+                    courseService.delete(courseModel);
+                    return ResponseEntity.status(OK).body("Course Deleted with Successful");
+                })
+                .orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Course Not Found!"));
+
     }
 
     @PutMapping("/{courseId}")
     public ResponseEntity<Object> updateCourse(@PathVariable UUID courseId,
                                                @Valid @RequestBody CourseDTO courseDTO) {
         var optionalCourseModel = courseService.findById(courseId);
-        if (!optionalCourseModel.isPresent()) {
-            ResponseEntity.status(NOT_FOUND).body("Course Not Found!");
-        }
-        var courseModel = optionalCourseModel.get();
 
-        courseModel.setName(courseDTO.getName());
-        courseModel.setDescription(courseDTO.getDescription());
-        courseModel.setImageUrl(courseDTO.getImageURL());
-        courseModel.setCourseStatus(courseDTO.getCourseStatus());
-        courseModel.setCourseLevel(courseDTO.getCourseLevel());
-        courseModel.setLastTimeUpdate(LocalDateTime.now(ZoneId.of("UTC")));
+        return optionalCourseModel.<ResponseEntity<Object>>map(courseModel -> {
+            BeanUtils.copyProperties(courseDTO, courseModel);
+            courseModel.setLastTimeUpdate(LocalDateTime.now(ZoneId.of("UTC")));
 
-        return ResponseEntity.status(OK).body(courseService.save(courseModel));
+            return ResponseEntity.status(OK).body(courseService.save(courseModel));
+        }).orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Course Not Found!"));
+
 
     }
 
@@ -74,9 +71,8 @@ public class CourseController {
     @GetMapping("/{courseId}")
     ResponseEntity<Object> getCourseModel(@PathVariable UUID courseId) {
         var optionalCourseModel = courseService.findById(courseId);
-        if (optionalCourseModel.isEmpty()) {
-            return ResponseEntity.status(NOT_FOUND).body("Course Not Found!");
-        }
-        return ResponseEntity.status(OK).body(optionalCourseModel.get());
+        return optionalCourseModel.<ResponseEntity<Object>>map(courseModel -> ResponseEntity.status(OK).body(courseModel))
+                .orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Course Not Found!"));
+
     }
 }
