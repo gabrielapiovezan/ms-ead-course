@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -20,7 +22,7 @@ import java.util.UUID;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "TB_COURSES")
+@Table(name = "tb_courses")
 public class CourseModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +36,7 @@ public class CourseModel implements Serializable {
     @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 250)
     private String description;
 
     @Column
@@ -58,7 +60,9 @@ public class CourseModel implements Serializable {
     private UUID userInstructor;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @OneToMany(mappedBy = "course",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Fetch(FetchMode.SUBSELECT)
     private Set<ModuleModel> modules;
 }

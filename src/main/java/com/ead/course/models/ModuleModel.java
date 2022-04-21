@@ -18,9 +18,11 @@ import java.util.UUID;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "TB_MODULES")
+@Table(name = "tb_modules")
 public class ModuleModel implements Serializable {
     private static final long serialVersionUID = 1L;
+
+
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
