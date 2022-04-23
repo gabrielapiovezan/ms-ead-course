@@ -57,7 +57,7 @@ public class ModuleController {
 
 
         return optionalModuleModel.<ResponseEntity<Object>>map(moduleModel -> {
-            moduleService.delete(optionalModuleModel.get());
+            moduleService.delete(moduleModel);
             return ResponseEntity.status(OK).body("Module Deleted with Successful");
         }).orElseGet(() -> ResponseEntity.status(NOT_FOUND).body("Module Not Found!"));
 
