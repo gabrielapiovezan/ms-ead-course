@@ -8,6 +8,9 @@ import com.ead.course.repositories.LessonRepository;
 import com.ead.course.repositories.ModuleRepository;
 import com.ead.course.services.CourseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -55,9 +58,10 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findById(courseId);
     }
 
+
     @Override
-    public List<CourseModel> findAll() {
-        return courseRepository.findAll();
+    public Page<CourseModel> findAll(Specification<CourseModel> spec, Pageable pageable) {
+        return courseRepository.findAll(spec, pageable);
     }
 
 
