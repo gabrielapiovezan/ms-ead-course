@@ -44,4 +44,6 @@ public class LessonServiceImpl implements LessonService {
         return lessonRepository.findAll(spec, pageable);
     }
 
+    public static class CourseUserServiceImpl implements CourseUserService {
+    }
 }

@@ -65,4 +65,7 @@ public class CourseModel implements Serializable {
     @EqualsAndHashCode.Exclude
     @Fetch(FetchMode.SUBSELECT)
     private Set<ModuleModel> modules;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+    Set<CourseUserModel> coursesUsers;
 }

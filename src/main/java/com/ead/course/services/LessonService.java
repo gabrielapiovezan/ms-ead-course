@@ -19,4 +19,7 @@ public interface LessonService {
    List<LessonModel> findAllLessonsintoModule(UUID moduleId);
 
     Page<LessonModel> findAllLessonsintoModule(Specification<LessonModel> spec, Pageable pageable);
+
+    interface CourseUserService {
+    }
 }
