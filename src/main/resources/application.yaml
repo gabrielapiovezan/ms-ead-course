@@ -13,5 +13,9 @@ spring:
     properties:
       hibernate:
         show_sql: true
-
         dialect: org.hibernate.dialect.MySQL8Dialect
+
+ead:
+  api:
+    url:
+      auth-user: 'http://localhost:8087'

@@ -1,7 +1,9 @@
 package com.ead.course.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
@@ -10,6 +12,8 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Table(name = "TB_COURSES_USERS")
@@ -30,4 +34,6 @@ public class CourseUserModel implements Serializable {
     @Column(updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
     @Type(type = "uuid-char")
     private UUID userId;
+
+
 }
