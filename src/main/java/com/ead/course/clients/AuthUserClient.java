@@ -22,7 +22,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CourseClient {
+public class AuthUserClient {
 
     private final UtilsServiceImpl utilsService;
 
@@ -50,5 +50,11 @@ public class CourseClient {
         log.info("Ending request/ courses {}", courseId);
         return new PageImpl<>(searchResult);
 
+    }
+
+    public ResponseEntity<UserDTO> getUserById(UUID userId) {
+        String url = REQUEST_URI + "/users/" + userId;
+
+        return restTemplate.exchange(url, HttpMethod.GET, null, UserDTO.class);
     }
 }
