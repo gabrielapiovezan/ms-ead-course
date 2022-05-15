@@ -1,5 +1,6 @@
 package com.ead.course.clients;
 
+import com.ead.course.dtos.CourseUserDTO;
 import com.ead.course.dtos.ResponsePageDTO;
 import com.ead.course.dtos.UserDTO;
 import com.ead.course.services.UtilsServiceImpl;
@@ -28,15 +29,15 @@ public class AuthUserClient {
 
     private final RestTemplate restTemplate;
 
-@Value("${ead.api.url.auth-user}")
+    @Value("${ead.api.url.auth-user}")
     String REQUEST_URI;
 
     public Page<UserDTO> getAllCoursesByUser(UUID courseId, Pageable pageable) {
         List<UserDTO> searchResult = null;
-        String url = REQUEST_URI+utilsService.createUrlGetAllUsersByCourse(courseId, pageable);
+        String url = REQUEST_URI + utilsService.createUrlGetAllUsersByCourse(courseId, pageable);
         log.debug("Rest Url {}", url);
         log.info("Rest Url {}", url);
-        
+
         try {
             ParameterizedTypeReference<ResponsePageDTO<UserDTO>> responseType = new ParameterizedTypeReference<ResponsePageDTO<UserDTO>>() {
             };
@@ -56,5 +57,15 @@ public class AuthUserClient {
         String url = REQUEST_URI + "/users/" + userId;
 
         return restTemplate.exchange(url, HttpMethod.GET, null, UserDTO.class);
+    }
+
+    public void postSubscriptionInCourse(UUID courseId, UUID userId) {
+        String url = REQUEST_URI + "/users/" + userId + "/courses/subscription";
+
+        var courseUser = CourseUserDTO.builder()
+                .courseId(courseId)
+                .userId(userId).build();
+        restTemplate.postForObject(url, courseUser, String.class);
+
     }
 }
