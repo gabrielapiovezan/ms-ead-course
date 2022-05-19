@@ -90,7 +90,7 @@ public class CourseController {
         if (userId != null) {
             courseModels = courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), pageable);
         } else {
-            courseService.findAll(spec, pageable);
+            courseModels= courseService.findAll(spec, pageable);
         }
         return ResponseEntity.status(OK).body(courseModels);
     }
