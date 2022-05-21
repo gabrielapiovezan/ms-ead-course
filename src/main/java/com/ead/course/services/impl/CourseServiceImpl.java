@@ -1,5 +1,6 @@
 package com.ead.course.services.impl;
 
+import com.ead.course.clients.AuthUserClient;
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.CourseUserModel;
 import com.ead.course.models.LessonModel;
@@ -19,6 +20,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +34,13 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseUserRepository courseUserRepository;
 
+    private final AuthUserClient authUserClient;
+
     @Transactional
     @Override
     public void delete(CourseModel courseModel) {
+
+        AtomicBoolean verifyCourseUser = new AtomicBoolean(false);
 
         List<ModuleModel> moduleModels = moduleRepository.findAllModulesIntoCourse(courseModel.getCourseId().toString());
 
@@ -43,6 +49,7 @@ public class CourseServiceImpl implements CourseService {
                 List<LessonModel> lessonModels = lessonRepository.findAllLessonsIntoModule(moduleModel.getModuleId().toString());
                 if (!lessonModels.isEmpty()) {
                     lessonRepository.deleteAll(lessonModels);
+                    verifyCourseUser.set(true);
                 }
                 moduleRepository.deleteAll(moduleModels);
             });
@@ -52,6 +59,10 @@ public class CourseServiceImpl implements CourseService {
             courseUserRepository.deleteAll();
         }
         courseRepository.delete(courseModel);
+
+        if(verifyCourseUser.get()){
+            authUserClient.deleteCourseUser(courseModel.getCourseId());
+        }
 
 
     }
