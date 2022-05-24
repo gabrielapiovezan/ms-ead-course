@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "TB_COURSES_USERS")
-public class CourseUserModel implements Serializable {
+@Table(name = "TB_USERS")
+public class UserModel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,13 +25,6 @@ public class CourseUserModel implements Serializable {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
-    @Type(type = "uuid-char")
-    private UUID id;
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private CourseModel course;
-
-    @Column(updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
     @Type(type = "uuid-char")
     private UUID userId;
 
