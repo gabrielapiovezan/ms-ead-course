@@ -18,11 +18,20 @@ spring:
       hibernate:
         show_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+  rabbitmq:
+    addresses: amqps://qlpqgslv:5iz5l1wnCLexdw328B3wf1yurbVB_IM7@woodpecker.rmq.cloudamqp.com/qlpqgslv
 
 ead:
   api:
     url:
       auth-user: 'http://ead-authuser-service/ead-authuser'
+  broker:
+    exchange:
+      userEventExchange: ead.userevent
+    queue:
+      userEventQueue:
+        name: ead.userevent.ms.course
+
 eureka:
   client:
     service-url:

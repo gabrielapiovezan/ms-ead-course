@@ -2,6 +2,8 @@ package com.ead.course.controllers;
 
 import com.ead.course.dtos.SubscriptionDTO;
 import com.ead.course.services.CourseService;
+import com.ead.course.services.UserService;
+import com.ead.course.specifications.SpecificationTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,8 +22,11 @@ public class CourseUserController {
 
     private final CourseService courseService;
 
+    private final UserService userService;
+
     @GetMapping("courses/{courseId}/users")
-    public ResponseEntity<Object> getAllCoursesByUser(@PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<Object> getAllCoursesByUser(SpecificationTemplate.UserSpec spec,
+                                                      @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.DESC) Pageable pageable,
                                                       @PathVariable UUID courseId) {
 
         var optionalCourseModel = courseService.findById(courseId);
@@ -29,7 +34,7 @@ public class CourseUserController {
         if (optionalCourseModel.isEmpty()) {
             return ResponseEntity.status(NOT_FOUND).body("Course Not Found!");
         }
-        return ResponseEntity.status(OK).body("");
+        return ResponseEntity.status(OK).body(userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable));
 
     }
 
@@ -37,7 +42,7 @@ public class CourseUserController {
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable UUID courseId,
                                                                @RequestBody SubscriptionDTO subscriptionDTO) {
 
-        ResponseEntity<UserDTO> responseUser;
+        ResponseEntity<Object> responseUser;
         var optionalCourseModel = courseService.findById(courseId);
 
         if (optionalCourseModel.isEmpty()) {
