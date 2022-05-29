@@ -70,6 +70,17 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findAll(spec, pageable);
     }
 
+    @Override
+    public boolean existsByCourseAndUser(UUID courseId, UUID userId) {
+        return !courseRepository.existsByCourseAndUser(courseId.toString(), userId.toString()).isEmpty();
+    }
+
+    @Override
+    @Transactional
+    public void saveSubscriptionUserInCourse(UUID courseId, UUID userId) {
+        courseRepository.saveSubscriptionCourseAndUser(courseId.toString(), userId.toString());
+    }
+
 
 }
 
