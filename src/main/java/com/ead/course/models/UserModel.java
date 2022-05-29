@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,6 +23,8 @@ public class UserModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Column(name = "user_id", nullable = false, columnDefinition = "VARCHAR(36)")
+    @Type(type = "uuid-char")
     private UUID userId;
     @Column(nullable = false, unique = true, length = 50)
     private String email;
