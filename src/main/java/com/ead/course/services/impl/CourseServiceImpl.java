@@ -51,6 +51,7 @@ public class CourseServiceImpl implements CourseService {
                 moduleRepository.deleteAll(moduleModels);
             });
         }
+        courseRepository.deleteCourseUserByCourseId(courseModel.getCourseId().toString());
         courseRepository.delete(courseModel);
     }
 

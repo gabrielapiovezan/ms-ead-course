@@ -24,6 +24,14 @@ public class SpecificationTemplate {
     public interface CourseSpec extends Specification<CourseModel> {
     }
 
+    @And({
+            @Spec(path = "email", spec = Like.class),
+            @Spec(path = "fullName", spec = Like.class),
+            @Spec(path = "userStatus", spec = Equal.class),
+            @Spec(path = "userType", spec = Equal.class)})
+    public interface UserSpec extends Specification<UserModel> {
+    }
+
     @Spec(path = "title", spec = Like.class)
     public interface ModuleSpec extends Specification<ModuleModel> {
     }
@@ -32,22 +40,13 @@ public class SpecificationTemplate {
     public interface LessonSpec extends Specification<LessonModel> {
     }
 
-    @And({
-            @Spec(path = "userType", spec = Equal.class),
-            @Spec(path = "email", spec = Like.class),
-            @Spec(path = "userStatus", spec = Equal.class),
-            @Spec(path = "fullName", spec = Like.class)
-    })
-    public interface UserSpec extends Specification<UserModel> {
-    }
-
     public static Specification<ModuleModel> moduleCourseId(final UUID courseId) {
         return (root, query, cb) -> {
             query.distinct(true);
             Root<ModuleModel> module = root;
             Root<CourseModel> course = query.from(CourseModel.class);
-            Expression<Collection<ModuleModel>> courseModules = course.get("modules");
-            return cb.and(cb.equal(course.get("courseId"), courseId), cb.isMember(module, courseModules));
+            Expression<Collection<ModuleModel>> coursesModules = course.get("modules");
+            return cb.and(cb.equal(course.get("courseId"), courseId), cb.isMember(module, coursesModules));
         };
     }
 
@@ -64,23 +63,22 @@ public class SpecificationTemplate {
     public static Specification<UserModel> userCourseId(final UUID courseId) {
         return (root, query, cb) -> {
             query.distinct(true);
-            Root<UserModel> module = root;
+            Root<UserModel> user = root;
             Root<CourseModel> course = query.from(CourseModel.class);
             Expression<Collection<UserModel>> coursesUsers = course.get("users");
-            return cb.and(cb.equal(course.get("courseId"), courseId), cb.isMember(module, coursesUsers));
+            return cb.and(cb.equal(course.get("courseId"), courseId), cb.isMember(user, coursesUsers));
         };
     }
 
     public static Specification<CourseModel> courseUserId(final UUID userId) {
         return (root, query, cb) -> {
             query.distinct(true);
-            Root<CourseModel> module = root;
+            Root<CourseModel> course = root;
             Root<UserModel> user = query.from(UserModel.class);
             Expression<Collection<CourseModel>> usersCourses = user.get("courses");
-            return cb.and(cb.equal(user.get("courseId"), userId), cb.isMember(module, usersCourses));
+            return cb.and(cb.equal(user.get("userId"), userId), cb.isMember(course, usersCourses));
         };
     }
 }
-
 
 
