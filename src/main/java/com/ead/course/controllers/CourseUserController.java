@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class CourseUserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @GetMapping("courses/{courseId}/users")
     public ResponseEntity<Object> getAllCoursesByUser(SpecificationTemplate.UserSpec spec,
                                                       @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.DESC) Pageable pageable,
@@ -39,6 +41,7 @@ public class CourseUserController {
 
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @PostMapping("courses/{courseId}/users/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable UUID courseId,
                                                                @RequestBody SubscriptionDTO subscriptionDTO) {
@@ -59,7 +62,7 @@ public class CourseUserController {
         if (optionalUser.get().getUserStatus().equals(UserStatus.BLOCKED.name())) {
             return ResponseEntity.status(NOT_FOUND).body("User is blocked!");
         }
-        courseService.saveSubscriptionUserInCourse(optionalCourseModel.get(),optionalUser.get());
+        courseService.saveSubscriptionUserInCourse(optionalCourseModel.get(), optionalUser.get());
         return ResponseEntity.status(CREATED).body("Subscription created successfully");
     }
 
